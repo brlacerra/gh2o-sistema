@@ -1,8 +1,12 @@
 "use client";
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import type { Ponto } from "@/app/components/FullScreenMap";
+import {type Ponto, formatDateBR } from "@/lib/utils";
 import { useRouter } from "next/navigation";
+
+
+
+
 
 interface RightSidebarProps {
   pontoSelecionado: Ponto | null;
@@ -311,6 +315,9 @@ function BasicInfo({ ponto }: { ponto: Ponto }) {
       <p>
         Lng: <span className="font-mono">{ponto.longitude.toFixed(5)}</span>
       </p>
+      <p>
+        Última leitura: <span className="font-mono">{formatDateBR(ponto.ultimaLeitura)}</span>
+      </p>
     </div>
   );
 }
@@ -322,11 +329,11 @@ function DetailsByTipo({ ponto }: { ponto: Ponto }) {
       <div className="mt-3 bg-slate-50 border border-slate-200 p-3 text-xs text-slate-700">
         <div className="font-semibold text-slate-800 mb-2">Resumo (Estação)</div>
         <ul className="space-y-1">
-          <li>Temperatura: {ponto.temperatura ?? "-"}°C</li>
-          <li>Umidade: {ponto.umidade ?? "-"}%</li>
+          <li>Temperatura: {ponto.temperatura?.toFixed(1) ?? "-"}°C</li>
+          <li>Umidade: {ponto.umidade?.toFixed(1) ?? "-"}%</li>
           <li>Chuva (24h): {ponto.chuva24h ?? "-"} mm</li>
-          <li>Luminosidade: {ponto.luminosidade ?? "-"}</li>
-          <li>Pressão Atm.: {ponto.pressaoAt ?? "-"} hPa</li>
+          <li>Luminosidade: {ponto.luminosidade?.toFixed(1) ?? "-"}</li>
+          <li>Pressão Atm.: {ponto.pressaoAt?.toFixed(1) ?? "-"} hPa</li>
         </ul>
       </div>
     );

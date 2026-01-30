@@ -2,7 +2,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import type { Ponto, PontoTipo } from "@/app/components/FullScreenMap";
+import type { Ponto, PontoTipo } from "@/app/components/mapa/FullScreenMap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFilter, faSearch } from "@fortawesome/free-solid-svg-icons";
 

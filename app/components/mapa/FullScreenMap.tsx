@@ -1,34 +1,13 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import Map, { Marker, NavigationControl, MapRef } from "react-map-gl/maplibre";
+import Map, { Marker, MapRef } from "react-map-gl/maplibre";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faClock, faCloudSunRain, faWater } from "@fortawesome/free-solid-svg-icons";
+import { type Ponto, type PontoTipo } from "@/lib/utils";
 
-export type PontoTipo = "estacao" | "horimetro" | "nivelador";
-
-export interface Ponto {
-  id: string;
-  tipo: PontoTipo;
-  latitude: number;
-  longitude: number;
-  nome: string;
-
-  chuva24h?: number;
-  luminosidade?: number;
-  pressaoAt?: number;
-  temperatura?: number;
-  umidade?: number;
-
-  usoAtual?: number;
-  usoAutorizado?: number;
-  usoHoje?: number;
-
-  nivelAtual?: number;
-  nivelAlerta?: number;
-}
 
 interface FullScreenMapProps {
   pontos: Ponto[];

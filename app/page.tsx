@@ -1,13 +1,14 @@
 "use client";
 
-import { useState } from "react";
-import FullScreenMap, { Ponto, PontoTipo } from "./components/FullScreenMap";
+import { useEffect, useMemo, useState } from "react";
+import FullScreenMap from "./components/mapa/FullScreenMap";
+import { Ponto, PontoTipo } from "@/lib/utils";
 import { NavbarClient } from "@/app/components/Navbar/NavbarClient";
-import { LeftFilters } from "@/app/components/LeftFilters/LeftFilters";
-import { RightSidebar } from "@/app/components/RightSideBar/RightSideBar";
-import { SENSORES_MOCK } from "./lib/sensores-mock";
+import { LeftFilters } from "@/app/components/mapa/LeftFilters/LeftFilters";
+import { RightSidebar } from "@/app/components/mapa/RightSideBar/RightSideBar";
+import { stationsToPontos, type StationsApiResponse } from "@/lib/mappers/stationToPonto";
 
-const PONTOS_MOCK = SENSORES_MOCK;
+
 
 export default function HomePage() {
   const [selectedPonto, setSelectedPonto] = useState<Ponto | null>(null);
@@ -20,15 +21,42 @@ export default function HomePage() {
   ]);
   const [searchTerm, setSearchTerm] = useState("");
 
-  const pontosFiltrados = PONTOS_MOCK.filter(p =>
-    activeTypes.includes(p.tipo),
-  );
+  const [pontos, setPontos] = useState<Ponto[]>([]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadStations() {
+      const res = await fetch("/api/stations", { cache: "no-store" });
+      if (!res.ok) throw new Error("Failed to fetch /api/stations");
+      const json = (await res.json()) as StationsApiResponse;
+
+      if (cancelled) return;
+      setPontos(stationsToPontos(json.data));
+    }
+
+    loadStations().catch(console.error);
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const toggleType = (tipo: PontoTipo) => {
     setActiveTypes(prev =>
       prev.includes(tipo) ? prev.filter(t => t !== tipo) : [...prev, tipo],
     );
   };
+
+  const pontosFiltrados = useMemo(() => {
+    const term = searchTerm.trim().toLowerCase();
+
+    return pontos.filter(p => {
+      if (!activeTypes.includes(p.tipo)) return false;
+      if (!term) return true;
+      return p.nome.toLowerCase().includes(term) || p.id.toLowerCase().includes(term);
+    });
+  }, [pontos, activeTypes, searchTerm]);
 
   return (
     <main className="w-screen h-screen relative">
@@ -44,7 +72,7 @@ export default function HomePage() {
       <NavbarClient />
 
       <LeftFilters
-        allPoints={PONTOS_MOCK}
+        allPoints={pontos} // aqui antes era PONTOS_MOCK
         activeTypes={activeTypes}
         onToggleType={toggleType}
         searchTerm={searchTerm}
