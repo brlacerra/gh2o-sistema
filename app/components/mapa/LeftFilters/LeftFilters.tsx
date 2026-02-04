@@ -2,7 +2,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import type { Ponto, PontoTipo } from "@/app/components/mapa/FullScreenMap";
+import type { Ponto, PontoTipo } from "@/lib/utils";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faFilter, faSearch } from "@fortawesome/free-solid-svg-icons";
 
@@ -38,7 +38,7 @@ export function LeftFilters({
   };
 
   return (
-    <aside className="absolute left-4 top-26 z-10">
+    <aside className="absolute left-4 top-38 z-10">
       {/* Botão hamburguer */}
       <button
         className="mb-2 flex items-center gap-2 px-3 py-2 bg-slate-900/80

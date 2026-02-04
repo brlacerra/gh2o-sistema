@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import { tempoToDate, formatDateBR } from "@/lib/utils";
+import { NavbarClient } from "@/app/components/Navbar/NavbarClient";
 
 
 function format1(v: number | null) {
@@ -59,7 +60,9 @@ export default async function EstacaoMeteorologicaDashboard({
   });
 
   return (
-    <section className="p-6 space-y-4">
+    <>
+    <NavbarClient title={`Dashboard - ${station.aliasSta} ${station.codSta}`} />
+    <section className="p-6 my-36 space-y-4">
       <header>
         <h2 className="text-lg font-semibold">Dashboard da Estação Meteorológica</h2>
         <p className="text-sm text-slate-600">
@@ -90,7 +93,7 @@ export default async function EstacaoMeteorologicaDashboard({
             {rows.map(r => {
               const tsString = r.ts.toString();
               const dt = tempoToDate(tsString);
-
+              
               return (
                 <tr key={tsString} className="border-b last:border-b-0">
                   <td className="p-2 font-mono text-xs">{tsString}</td>
@@ -111,5 +114,6 @@ export default async function EstacaoMeteorologicaDashboard({
         </table>
       </div>
     </section>
+    </>
   );
 }

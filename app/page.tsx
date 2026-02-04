@@ -69,7 +69,7 @@ export default function HomePage() {
         focusPonto={focusPonto}
       />
 
-      <NavbarClient />
+      <NavbarClient title="Sistema de gerenciamento" />
 
       <LeftFilters
         allPoints={pontos} // aqui antes era PONTOS_MOCK

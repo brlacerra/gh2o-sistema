@@ -41,7 +41,7 @@ function DesktopSidebar({
   const p = pontoSelecionado;
 
   return (
-    <aside className="hidden md:block absolute right-4 top-26 w-80 bg-white/95 shadow-lg p-4 z-10 border border-slate-200">
+    <aside className="hidden md:block absolute right-4 top-38 w-80 bg-white/95 shadow-lg p-4 z-10 border border-slate-200">
       <Header ponto={p} />
       <BasicInfo ponto={p} />
       <DetailsByTipo ponto={p} />
