@@ -7,16 +7,74 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Cli {
-  codCli   String  @id @db.VarChar(5)
-  nomeCli  String? @db.VarChar(50)
-  emailCli String? @db.VarChar(50)
-  telCli   String? @db.VarChar(11)
-  Sta      Sta[]
-  Usr      Usr[]
+model data {
+  codSta     String   @db.VarChar(20)
+  ts         BigInt   @db.UnsignedBigInt
+  pulsos     Int      @default(0)
+  tempAvg    Float?
+  preAvg     Float?
+  umiAvg     Float?
+  lumAvg     Float?
+  vvAvg      Float?
+  dv         Float?
+  created_at DateTime @default(now())
+  sta        sta      @relation(fields: [codSta], references: [codSta], onDelete: Cascade, map: "fk_data_sta")
+
+  @@id([codSta, ts])
+  @@index([codSta, ts], map: "idx_data_codSta_ts")
 }
 
-model Data {
+model session {
+  id           String   @id @db.VarChar(255)
+  sessionToken String   @unique(map: "uq_session_sessionToken") @db.VarChar(255)
+  userId       String   @db.VarChar(255)
+  expires      DateTime
+  created_at   DateTime @default(now())
+  updated_at   DateTime @default(now())
+  usuario      usuario  @relation(fields: [userId], references: [codUsr], onDelete: Cascade, map: "fk_session_user")
+
+  @@index([expires], map: "idx_session_expires")
+  @@index([userId], map: "idx_session_userId")
+}
+
+model sta {
+  codSta     String   @id @db.VarChar(20)
+  nomeSta    String   @db.VarChar(120)
+  aliasSta   String?  @db.VarChar(120)
+  latSta     Decimal? @db.Decimal(9, 6)
+  longSta    Decimal? @db.Decimal(9, 6)
+  resSta     Decimal? @db.Decimal(10, 6)
+  perSta     Int      @default(900) @db.UnsignedInt
+  hasPulsos  Boolean  @default(true)
+  hasTemp    Boolean  @default(true)
+  hasPressao Boolean  @default(true)
+  hasUmidade Boolean  @default(true)
+  hasLum     Boolean  @default(true)
+  hasVent    Boolean  @default(true)
+  hasDv      Boolean  @default(false)
+  is_public  Boolean  @default(false)
+  codUsr     String   @db.VarChar(255)
+  created_at DateTime @default(now())
+  updated_at DateTime @default(now())
+  data       data[]
+  usuario    usuario  @relation(fields: [codUsr], references: [codUsr], map: "fk_sta_usuario")
+
+  @@index([codUsr], map: "idx_sta_codUsr")
+  @@index([is_public], map: "idx_sta_public")
+}
+
+model usuario {
+  codUsr     String       @id @db.VarChar(255)
+  emailUsr   String       @unique(map: "uq_usuario_email") @db.VarChar(255)
+  pwdUsr     String       @db.VarChar(255)
+  role       usuario_role @default(user)
+  created_at DateTime     @default(now())
+  updated_at DateTime     @default(now())
+  session    session[]
+  sta        sta[]
+}
+
+model antigosDados {
   codSta  String @db.VarChar(6)
   ts      BigInt
   pulsos  Int?
@@ -40,28 +98,7 @@ model Data {
   @@id([codSta, ts])
 }
 
-model Sta {
-  codSta    String  @id @db.VarChar(6)
-  nomeSta   String? @db.VarChar(50)
-  aliasSta  String? @db.VarChar(15)
-  codCliSta String? @db.VarChar(5)
-  latSta    Float?  @db.Float
-  longSta   Float?  @db.Float
-  resSta    Float?  @db.Float
-  perSta    Int?
-  ctlSta    Int?    @db.UnsignedTinyInt
-  Cli       Cli?    @relation(fields: [codCliSta], references: [codCli], onDelete: NoAction, onUpdate: NoAction, map: "Sta_ibfk_1")
-
-  @@index([codCliSta], map: "codCliSta")
-}
-
-model Usr {
-  codUsr    String   @id @db.VarChar(5)
-  pwdUsr    String?  @db.VarChar(60)
-  codCliUsr String?  @db.VarChar(5)
-  emailUsr  String?  @db.VarChar(50)
-  chgPwdUsr Boolean?
-  Cli       Cli?     @relation(fields: [codCliUsr], references: [codCli], onDelete: NoAction, onUpdate: NoAction, map: "Usr_ibfk_1")
-
-  @@index([codCliUsr], map: "codCliUsr")
+enum usuario_role {
+  admin
+  user
 }

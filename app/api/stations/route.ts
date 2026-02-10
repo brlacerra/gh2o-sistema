@@ -8,16 +8,15 @@ function jsonBigIntReplacer(_key: string, value: unknown) {
 export async function GET() {
   try {
     const stations = await prisma.sta.findMany({
+      where : { is_public: true },
       select: {
         codSta: true,
         nomeSta: true,
         aliasSta: true,
-        codCliSta: true,
         latSta: true,
         longSta: true,
         resSta: true,
         perSta: true,
-        ctlSta: true,
       },
       orderBy: { codSta: "asc" },
     });
@@ -31,20 +30,10 @@ export async function GET() {
         ts: true,
         pulsos: true,
         tempAvg: true,
-        tempMin: false,
-        tempMax: false,
         preAvg: true,
-        preMin: false,
-        preMax: false,
         umiAvg: true,
-        umiMin: false,
-        umiMax: false,
         lumAvg: true,
-        lumMin: false,
-        lumMax: false,
         vvAvg: true,
-        vvMin: false,
-        vvMax: false,
         dv: true,
       },
     });

@@ -310,10 +310,10 @@ function BasicInfo({ ponto }: { ponto: Ponto }) {
   return (
     <div className="space-y-0.5 text-xs text-slate-600">
       <p>
-        Lat: <span className="font-mono">{ponto.latitude.toFixed(5)}</span>
+        Lat: <span className="font-mono">{ponto.latitude}</span>
       </p>
       <p>
-        Lng: <span className="font-mono">{ponto.longitude.toFixed(5)}</span>
+        Lng: <span className="font-mono">{ponto.longitude}</span>
       </p>
       <p>
         Última leitura: <span className="font-mono">{formatDateBR(ponto.ultimaLeitura)}</span>

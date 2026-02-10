@@ -7,6 +7,7 @@ import "maplibre-gl/dist/maplibre-gl.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faClock, faCloudSunRain, faWater } from "@fortawesome/free-solid-svg-icons";
 import { type Ponto, type PontoTipo } from "@/lib/utils";
+import { healthFromLastReading, ReadingHealth } from "@/lib/mappers/stationToPonto";
 
 
 interface FullScreenMapProps {
@@ -14,6 +15,22 @@ interface FullScreenMapProps {
   selectedPonto: Ponto | null;
   onSelectPonto: (p: Ponto | null) => void;
   focusPonto?: Ponto | null;
+}
+
+function colorClass(health: ReadingHealth, selected?: boolean){
+  if (selected) return "text-yellow-300";
+
+  switch(health){
+    case "ok":
+      return "text-green-500";
+    case "warn":
+      return "text-orange-500";
+    case "offline":
+      return "text-red-500";
+    case "unknown":
+    default:
+      return "text-gray-500";
+  }
 }
 
 function getIconSizeByZoom(zoom: number) {
@@ -27,10 +44,12 @@ function IconByTipo({
   tipo,
   size,
   selected,
+  health,
 }: {
   tipo: PontoTipo;
   size: number;
   selected?: boolean;
+  health: ReadingHealth;
 }) {
   const style: React.CSSProperties = {
     width: size,
@@ -40,35 +59,11 @@ function IconByTipo({
     transition: "transform 0.15s ease",
   };
 
-  const color = selected ? "text-yellow-300" : "text";
-
-  if (tipo === "horimetro") {
-    return (
-      <div style={style} className="text-purple-500">
-        <FontAwesomeIcon icon={faClock} className={color} />
-      </div>
-    );
-  }
-
-  if (tipo === "estacao") {
-    return (
-      <div style={style} className="text-orange-500">
-        <FontAwesomeIcon icon={faCloudSunRain} className={color} />
-      </div>
-    );
-  }
-
-  if (tipo === "nivelador") {
-    return (
-      <div style={style} className="text-blue-300">
-        <FontAwesomeIcon icon={faWater} className={color} />
-      </div>
-    );
-  }
+  const icon = tipo === "horimetro" ? faClock : tipo === "estacao" ? faCloudSunRain : faWater;
 
   return (
-    <div style={style}>
-      <span className="text-[11px]">•</span>
+    <div style={style} className={colorClass(health, selected)}>
+      <FontAwesomeIcon icon={icon} />
     </div>
   );
 }
@@ -129,7 +124,8 @@ export default function FullScreenMap({
               <IconByTipo
                 tipo={ponto.tipo}
                 size={iconSize}
-                selected={selectedPonto?.id === ponto.id}
+                selected={selectedPonto?.id === ponto.id} 
+                health={healthFromLastReading(ponto.ultimaLeitura)}
               />
             </button>
           </Marker>

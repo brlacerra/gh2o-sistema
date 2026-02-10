@@ -11,8 +11,9 @@ interface NavbarProps {
 
 export function NavbarClient({ title }: NavbarProps) {
   return (
-    <header className="absolute top-0 left-0 right-0 z-20 shadow-md">
-      <nav className="hidden sm:flex items-center justify-between px-20 h-12 bg-gray-100">
+    <header className="fixed top-0 left-0 right-0 z-50 shadow-md">
+      {!title?.includes("Dashboard") || title?.includes("Pluviometria") && (
+        <nav className="hidden sm:flex items-center justify-between px-20 h-12 bg-gray-100">
         <nav className="flex items-center gap-10">
           <div className="flex gap-2 items-center text-sm">
         <FontAwesomeIcon icon={faLocationDot} className="text-emerald-500" />
@@ -49,6 +50,8 @@ export function NavbarClient({ title }: NavbarProps) {
           </div>
         </nav>
       </nav>
+      )}
+      
       <nav className="flex items-center justify-between px-4 md:px-20 h-24
                       bg-white backdrop-blur-sm text-white">
         <div className="flex items-center gap-3 ">

@@ -1,4 +1,4 @@
-export default async function PluviometriaPage({
+export default async function UmidadePage({
   params,
 }: {
   params: Promise<{ codSta: string }>;
@@ -6,7 +6,7 @@ export default async function PluviometriaPage({
 
   return (
     <section className="">
-        <h1>Página de pluviometria</h1>
+        <h1>Página de Umidade</h1>
     </section>
   );
 }
