@@ -54,7 +54,7 @@ export function healthFromLastReading(
   const diffMs = now.getTime() - last.getTime();
   const diffMin = diffMs / 60000;
 
-  if (diffMin <= 15) return "ok";     // até 15 min
+  if (diffMin <= 20) return "ok";     // até 15 min
   if (diffMin <= 600) return "warn";   // 15-600 min
   return "offline";                      // > 600 min
 }

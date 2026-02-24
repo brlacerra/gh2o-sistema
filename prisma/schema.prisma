@@ -66,36 +66,13 @@ model sta {
 model usuario {
   codUsr     String       @id @db.VarChar(255)
   emailUsr   String       @unique(map: "uq_usuario_email") @db.VarChar(255)
+  nomeUsr    String?      @db.VarChar(255)
   pwdUsr     String       @db.VarChar(255)
   role       usuario_role @default(user)
   created_at DateTime     @default(now())
   updated_at DateTime     @default(now())
   session    session[]
   sta        sta[]
-}
-
-model antigosDados {
-  codSta  String @db.VarChar(6)
-  ts      BigInt
-  pulsos  Int?
-  tempAvg Float? @db.Float
-  tempMin Float? @db.Float
-  tempMax Float? @db.Float
-  preAvg  Float? @db.Float
-  preMin  Float? @db.Float
-  preMax  Float? @db.Float
-  umiAvg  Float? @db.Float
-  umiMin  Float? @db.Float
-  umiMax  Float? @db.Float
-  lumAvg  Float? @db.Float
-  lumMin  Float? @db.Float
-  lumMax  Float? @db.Float
-  vvAvg   Float? @db.Float
-  vvMin   Float? @db.Float
-  vvMax   Float? @db.Float
-  dv      Int?
-
-  @@id([codSta, ts])
 }
 
 enum usuario_role {

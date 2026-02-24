@@ -1,15 +1,86 @@
 "use client";
 
 import Image from "next/image";
+
+import { useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faLocationDot, faClock, faPhone } from "@fortawesome/free-solid-svg-icons";
 import { faFacebookF, faInstagram, faLinkedin } from "@fortawesome/free-brands-svg-icons";
+
+type MeResponse = {
+  user: null | {
+    codUsr: string;
+    emailUsr: string;
+    nomeUsr: string;
+    role: "admin" | "user";
+  }
+}
 
 interface NavbarProps {
   title?: string;
 }
 
 export function NavbarClient({ title }: NavbarProps) {
+
+  const router = useRouter();
+
+  const [me, setMe] = useState<MeResponse["user"]>(null);
+  const [loadingMe, setLoadingMe] = useState(true);
+
+  const [open, setOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadMe(){
+      setLoadingMe(true);
+      try {
+        const res = await fetch("/api/auth/me", {cache: "no-store"});
+        if (!res.ok){
+          setMe(null);
+          return;
+        }
+
+        const json = (await res.json()) as any;
+
+        const user = "user" in json ? json.user : null;
+        setMe(user ?? null);
+      } catch {
+        setMe(null);
+      } finally {
+        setLoadingMe(false);
+      }
+    }
+
+    loadMe();
+
+    return () => {
+      cancelled = true;
+    }
+  }, []);
+
+  useEffect(() => {
+    function onDocClick(e:MouseEvent){
+      if(!open) return;
+      const el = menuRef.current;
+      if(!el) return;
+      if(e.target instanceof Node && !el.contains(e.target)) setOpen(false);
+    }
+    document.addEventListener("mousedown", onDocClick);
+    return () => document.removeEventListener("mousedown", onDocClick);
+  }, [open]);
+
+  async function doLogout(){
+    await fetch("/api/auth/logout", {method: "POST"}).catch(() => null);
+    setOpen(false);
+    setMe(null);
+    router.refresh();
+    router.push("/");
+  }
+
   return (
     <header className="fixed top-0 left-0 right-0 z-50 shadow-md">
       {!title?.includes("Dashboard") || title?.includes("Pluviometria") && (
@@ -65,10 +136,52 @@ export function NavbarClient({ title }: NavbarProps) {
             </div>
         </div>
 
-        <div className="flex items-center gap-3">
-          <button className="px-7 py-1.5 bg-emerald-500 hover:bg-emerald-400 text-lg">
-            Login
-          </button>
+        <div className="flex items-center gap-3" ref={menuRef}>
+          {loadingMe ? (
+            <div className="text-stone-600 text-sm">...</div>
+          ) : me ? (
+            <div className="relative">
+              <button
+                type="button"
+                className="px-5 py-1.5 bg-gray-200 hover:bg-gray-300 text-lg text-black border border-gray-300"
+                onClick={() => setOpen(v => !v)}
+              >
+                Olá, {me.nomeUsr}
+              </button>
+
+              {open && (
+                <div className="absolute right-0 mt-2 w-48 bg-white text-slate-800 border border-gray-400 shadow-md overflow-hidden">
+                  <button
+                    type="button"
+                    className="block w-full text-left px-4 py-2 hover:bg-slate-50"
+                    onClick={() => {
+                      setOpen(false);
+                      router.push("/conta"); // placeholder
+                    }}
+                  >
+                    
+                    Conta
+                  </button>
+
+                  <button
+                    type="button"
+                    className="block w-full text-left px-4 py-2 hover:bg-slate-50"
+                    onClick={doLogout}
+                  >
+                    Logout
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <button
+              type="button"
+              className="px-7 py-1.5 bg-emerald-500 hover:bg-emerald-400 text-lg"
+              onClick={() => router.push("/login")}
+            >
+              Login
+            </button>
+          )}
         </div>
       </nav>
     </header>

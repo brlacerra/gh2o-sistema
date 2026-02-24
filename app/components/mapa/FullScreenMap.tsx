@@ -75,8 +75,8 @@ export default function FullScreenMap({
   focusPonto,
 }: FullScreenMapProps) {
   const [viewState, setViewState] = useState({
-    latitude: -18.637385,
-    longitude: -47.45,
+    latitude: -18.7315157,
+    longitude: -47.5004928,
     zoom: 11,
   });
 
