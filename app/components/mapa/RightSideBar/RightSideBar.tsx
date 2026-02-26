@@ -6,8 +6,6 @@ import { useRouter } from "next/navigation";
 
 
 
-
-
 interface RightSidebarProps {
   pontoSelecionado: Ponto | null;
   onClearSelection: () => void;
@@ -296,6 +294,11 @@ function Header({ ponto }: { ponto: Ponto }) {
         <h3 className="font-semibold text-slate-900 truncate">{ponto.nome}</h3>
         <p className="text-[11px] text-slate-500">
           ID: <span className="font-mono">{ponto.id}</span>
+        </p>
+        <p className="text-[11px] text-slate-500">
+          {
+            ponto.is_public ? "Sensor público" : "Seu sensor"
+          }
         </p>
       </div>
 

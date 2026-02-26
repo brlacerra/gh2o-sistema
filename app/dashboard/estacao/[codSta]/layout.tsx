@@ -1,7 +1,8 @@
 import { EstacaoSidebar } from "@/app/components/dashboard/shell/DashBoardNav";
 import { NavbarClient } from "@/app/components/Navbar/NavbarClient";
+import { canAccessStation } from "@/lib/auth/canAccessStation";
 import { prisma } from "@/lib/prisma";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
 export default async function EstacaoLayout({
   children,
@@ -11,6 +12,27 @@ export default async function EstacaoLayout({
   params: Promise<{ codSta: string }>;
 }) {
   const { codSta } = await params;
+
+  const access = await canAccessStation(codSta);
+
+  if (!access.station) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <h1 className="text-2xl font-bold">Estação Não Encontrada</h1>
+      </div>
+    );
+  }
+
+  if (!access.allowed) {
+    if (access.reason === "forbidden") {
+      return (
+        <div className="min-h-screen flex items-center justify-center">
+          <h1 className="text-2xl font-bold">Acesso Negado</h1>
+        </div>
+      );
+    }
+    notFound();
+  }
 
   const station = await prisma.sta.findUnique({
     where: { codSta },

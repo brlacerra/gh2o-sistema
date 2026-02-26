@@ -54,7 +54,7 @@ export function EstacaoSidebar({
         <nav className="p-2">
           {items.map((it) => {
             const baseClass =
-              "block px-4 py-3 mb-2 text-lg transition font-semibold";
+              "block px-4 py-3 mb-2 text-sm lg:text-lg transition font-semibold";
 
             if (!it.enabled) {
               return (

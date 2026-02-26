@@ -7,6 +7,7 @@ export interface Ponto {
   longitude: number;
   nome: string;
   ultimaLeitura?: Date;
+  is_public?: boolean;
 
   chuva24h?: number;
   luminosidade?: number;

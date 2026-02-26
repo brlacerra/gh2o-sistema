@@ -1,4 +1,3 @@
-// app/components/LeftFilters.tsx
 "use client";
 
 import { useMemo, useState } from "react";
@@ -23,7 +22,7 @@ export function LeftFilters({
   onSearchTermChange,
   onSelectPonto,
 }: LeftFiltersProps) {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
 
   const results = useMemo(() => {
     const term = searchTerm.trim().toLowerCase();

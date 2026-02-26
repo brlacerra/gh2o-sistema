@@ -11,6 +11,7 @@ export type StationApiItem = {
   longSta: number | null;
   resSta: number | null;
   perSta: number | null;
+  is_public: boolean;
   latestData: null | {
     codSta: string;
     ts: string;
@@ -34,6 +35,7 @@ export function stationsToPontos(stations: StationApiItem[]): Ponto[] {
       latitude: s.latSta as number,
       longitude: s.longSta as number,
       nome: s.aliasSta ?? s.nomeSta ?? s.codSta,
+      is_public: s.is_public,
 
       temperatura: s.latestData?.tempAvg ?? undefined,
       umidade: s.latestData?.umiAvg ?? undefined,

@@ -8,6 +8,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faClock, faCloudSunRain, faWater } from "@fortawesome/free-solid-svg-icons";
 import { type Ponto, type PontoTipo } from "@/lib/utils";
 import { healthFromLastReading, ReadingHealth } from "@/lib/mappers/stationToPonto";
+import { getCurrentUser } from "@/lib/auth/getCurrentUser";
 
 
 interface FullScreenMapProps {
@@ -15,6 +16,25 @@ interface FullScreenMapProps {
   selectedPonto: Ponto | null;
   onSelectPonto: (p: Ponto | null) => void;
   focusPonto?: Ponto | null;
+}
+
+/*const defmapProps = {
+    latitude: -18.7315157,
+    longitude: -47.5004928,
+    zoom: 10,
+  }*/
+  const defmapProps = {
+    latitude: 0,
+    longitude: 0,
+    zoom: 2,
+  }
+
+type meResponse = {
+  user: {
+    latMap: number | null;
+    longMap: number | null;
+    zoomMap: number | null;
+  }
 }
 
 function colorClass(health: ReadingHealth, selected?: boolean){
@@ -60,6 +80,7 @@ function IconByTipo({
   };
 
   const icon = tipo === "horimetro" ? faClock : tipo === "estacao" ? faCloudSunRain : faWater;
+  
 
   return (
     <div style={style} className={colorClass(health, selected)}>
@@ -73,28 +94,65 @@ export default function FullScreenMap({
   selectedPonto,
   onSelectPonto,
   focusPonto,
-}: FullScreenMapProps) {
-  const [viewState, setViewState] = useState({
-    latitude: -18.7315157,
-    longitude: -47.5004928,
-    zoom: 11,
-  });
-
+}: FullScreenMapProps) {  
+  const [viewState, setViewState] = useState({...defmapProps});
   const mapRef = useRef<MapRef | null>(null);
-
   const maptilerKey = process.env.NEXT_PUBLIC_MAPTILER_KEY;
   const iconSize = getIconSizeByZoom(viewState.zoom);
+  const [didLoadUserView, setDidLoadUserView] = useState(false);
 
   useEffect(() => {
+    let cancelled = false;
+
+    async function loadMe() {
+      try {
+        const res = await fetch("/api/auth/me", { credentials: "include" });
+        if (!res.ok){
+            throw new Error("Failed to fetch user data");
+        }
+
+        const data = (await res.json()) as meResponse;
+        const user = data.user;
+
+        if (cancelled) return;
+
+        // fallback: se não tiver user ou algum campo null, usa o DEFAULT_VIEW
+        const nextView = {
+          latitude: user?.latMap ?? defmapProps.latitude,
+          longitude: user?.longMap ?? defmapProps.longitude,
+          zoom: user?.zoomMap ?? defmapProps.zoom,
+        };
+
+        mapRef.current?.flyTo({
+          center: [nextView.longitude, nextView.latitude],
+          zoom: Math.max(nextView.zoom),
+          essential: true,
+          duration: 2000,
+        });
+        setDidLoadUserView(true);
+      } catch {
+        // se der erro, fica no default
+      }
+    }
+
+    loadMe();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // (Opcional) evita rodar flyTo do focusPonto antes de carregar a view do usuário
+  useEffect(() => {
+    if (!didLoadUserView) return;
     if (!focusPonto || !mapRef.current) return;
 
     mapRef.current.flyTo({
       center: [focusPonto.longitude, focusPonto.latitude],
-      zoom: Math.max(viewState.zoom, 13),
+      zoom: Math.max(viewState.zoom, 14),
       essential: true,
       duration: 200,
     });
-  }, [focusPonto, viewState.zoom]);
+  }, [didLoadUserView, focusPonto, viewState.zoom]);
 
   return (
     <div className="w-screen h-screen relative">

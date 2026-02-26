@@ -71,6 +71,9 @@ model usuario {
   role       usuario_role @default(user)
   created_at DateTime     @default(now())
   updated_at DateTime     @default(now())
+  latMap     Decimal?     @db.Decimal(10, 7)
+  longMap    Decimal?     @db.Decimal(10, 7)
+  zoomMap    Decimal?     @db.Decimal(10, 7)
   session    session[]
   sta        sta[]
 }

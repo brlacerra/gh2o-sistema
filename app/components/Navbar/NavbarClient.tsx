@@ -78,7 +78,14 @@ export function NavbarClient({ title }: NavbarProps) {
     setOpen(false);
     setMe(null);
     router.refresh();
-    router.push("/");
+    window.location.href = "/";
+  }
+
+  async function goToStationCreation(){
+    router.push("/admin/stations/new");
+  }
+  async function goToStationChange(){
+    router.push("/admin/stations/change");
   }
 
   return (
@@ -162,7 +169,27 @@ export function NavbarClient({ title }: NavbarProps) {
                     
                     Conta
                   </button>
-
+                    {me.role === "admin" ? (
+                      <><button
+                        type="button"
+                        className="block w-full text-left px-4 py-2 hover:bg-slate-50"
+                        onClick={() => {
+                          setOpen(false);
+                          goToStationCreation();
+                        } }
+                      >
+                        Criar estação
+                      </button><button
+                        type="button"
+                        className="block w-full text-left px-4 py-2 hover:bg-slate-50"
+                        onClick={() => {
+                          setOpen(false);
+                          goToStationChange();
+                        } }
+                      >
+                          Editar estação
+                        </button></>
+                    ) : null}
                   <button
                     type="button"
                     className="block w-full text-left px-4 py-2 hover:bg-slate-50"
